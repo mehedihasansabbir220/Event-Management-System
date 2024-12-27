@@ -8,6 +8,7 @@ import { AttendeesModule } from './attendees/attendees.module';
 import { RegistrationsModule } from './registrations/registrations.module';
 import { ConfigModule } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import * as redisStore from 'cache-manager-redis-store';
     EventsModule,
     AttendeesModule,
     RegistrationsModule,
+    HealthModule
   ],
 })
 export class AppModule {}
