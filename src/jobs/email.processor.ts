@@ -32,4 +32,22 @@ export class EmailProcessor {
       `,
     });
   }
+
+  // Add the new event reminder method here
+  @Process('event-reminder')
+  async handleEventReminder(job: Job) {
+    const { attendeeEmail, attendeeName, eventName, eventDate } = job.data;
+
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: attendeeEmail,
+      subject: `Reminder: ${eventName} Tomorrow`,
+      html: `
+        <h1>Event Reminder</h1>
+        <p>Dear ${attendeeName},</p>
+        <p>This is a reminder that ${eventName} is tomorrow at ${new Date(eventDate).toLocaleTimeString()}.</p>
+        <p>We look forward to seeing you there!</p>
+      `,
+    });
+  }
 }
