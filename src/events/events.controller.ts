@@ -1,15 +1,20 @@
-import { Controller, Get, Post, Body, Param, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseInterceptors, Patch, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { Event } from '../entities/event.entity';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { EventsGateway } from 'src/websocket/events.gateway';
+import { UpdateEventDto } from 'src/dto/update-event.dto';
 
 @ApiTags('events')
 @Controller('events')
 @UseInterceptors(CacheInterceptor)
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(
+    private readonly eventsService: EventsService,
+    private readonly eventsGateway: EventsGateway,
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new event' })
@@ -28,5 +33,20 @@ export class EventsController {
   @ApiOperation({ summary: 'Get event by id' })
   async findOne(@Param('id') id: string): Promise<Event> {
     return this.eventsService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update event details' })
+  async update(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+  ): Promise<Event> {
+    return this.eventsService.update(id, updateEventDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete an event' })
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.eventsService.remove(id);
   }
 }

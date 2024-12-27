@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { RegistrationsService } from './registrations.service';
 import { CreateRegistrationDto } from '../dto/create-registration.dto';
@@ -18,5 +18,10 @@ export class RegistrationsController {
   @ApiOperation({ summary: 'Get all registrations for an event' })
   async findByEventId(@Param('eventId') eventId: string) {
     return this.registrationsService.findByEventId(eventId);
+  }
+  @Delete(':id')
+  @ApiOperation({ summary: 'Cancel a registration' })
+  async remove(@Param('id') id: string): Promise<void> {
+    return this.registrationsService.remove(id);
   }
 }

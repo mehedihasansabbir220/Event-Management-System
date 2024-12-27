@@ -6,6 +6,7 @@ import { RegistrationsService } from './registrations.service';
 import { RegistrationsController } from './registrations.controller';
 import { EventsModule } from '../events/events.module';
 import { AttendeesModule } from '../attendees/attendees.module';
+import { EventsGateway } from 'src/websocket/events.gateway';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { AttendeesModule } from '../attendees/attendees.module';
     EventsModule,
     AttendeesModule,
   ],
-  providers: [RegistrationsService],
+  providers: [RegistrationsService, EventsGateway],
   controllers: [RegistrationsController],
   exports: [RegistrationsService],
 })

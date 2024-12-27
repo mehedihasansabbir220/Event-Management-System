@@ -10,7 +10,7 @@ export class AttendeesService {
   constructor(
     @InjectRepository(Attendee)
     private attendeesRepository: Repository<Attendee>,
-  ) {}
+  ) { }
 
   async create(createAttendeeDto: CreateAttendeeDto): Promise<Attendee> {
     const existingAttendee = await this.attendeesRepository.findOne({
@@ -25,8 +25,16 @@ export class AttendeesService {
     return await this.attendeesRepository.save(attendee);
   }
 
-  async findAll(search: string): Promise<Attendee[]> {
-    return await this.attendeesRepository.find();
+  async findAll(search?: string): Promise<Attendee[]> {
+    if (!search) {
+      return this.attendeesRepository.find();
+    }
+
+    return this.attendeesRepository
+      .createQueryBuilder('attendee')
+      .where('LOWER(attendee.name) LIKE LOWER(:search)', { search: `%${search}%` })
+      .orWhere('LOWER(attendee.email) LIKE LOWER(:search)', { search: `%${search}%` })
+      .getMany();
   }
 
   async findOne(id: string): Promise<Attendee> {
@@ -36,12 +44,19 @@ export class AttendeesService {
     }
     return attendee;
   }
-  async findWithMultipleRegistrations(): Promise<Attendee[]> {
-    return this.attendeesRepository
-      .createQueryBuilder('attendee')
-      .leftJoinAndSelect('attendee.registrations', 'registration')
-      .groupBy('attendee.id')
-      .having('COUNT(registration.id) > 1')
-      .getMany();
+  async findAttendeesWithMultipleRegistrations(): Promise<Attendee[]> {
+    const result = await this.attendeesRepository.query(`
+      SELECT a.*, COUNT(r.id) as registration_count
+      FROM attendee a
+      JOIN registration r ON a.id = r.attendee_id
+      GROUP BY a.id
+      HAVING COUNT(r.id) > 1
+    `);
+    
+    return result;
+  }
+  async remove(id: string): Promise<void> {
+    const attendee = await this.findOne(id);
+    await this.attendeesRepository.remove(attendee);
   }
 }
