@@ -228,7 +228,7 @@ npm run build
 
 3. Start the application:
 ```bash
-npm run start:prod
+npm run start:dev
 ```
 
 ### Production Considerations
